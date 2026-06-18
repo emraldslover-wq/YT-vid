@@ -1,0 +1,29 @@
+name: Download 2h Video
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download yt-dlp binary
+        run: sudo wget https://github.com -O /usr/local/bin/yt-dlp
+
+      - name: Set permissions
+        run: sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Fetch and process video file
+        run: yt-dlp -f "bestvideo[height<=1080]+bestaudio/best" --merge-output-format mp4 -o "minecraft_hunger_games.mp4" "https://youtube.com"
+
+      - name: Upload processed file asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: minecraft-video-file
+          path: minecraft_hunger_games.mp4
+          retention-days: 1
